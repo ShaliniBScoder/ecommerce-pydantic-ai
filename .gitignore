@@ -69,4 +69,6 @@ Frotend/node_modules
 Frontend/dist/
 Frontend/.env
 
+.logfire
+
 shopenv/
