@@ -22,7 +22,7 @@ export function renderHero() {
             <p>Happy Customers</p>
           </div>
           <div class="hero-stat">
-            <p>4.5</p>
+            <p>4.9</p>
             <p>Average Rating</p>
           </div>
         </div>
@@ -33,7 +33,6 @@ export function renderHero() {
       </div>
     </div>
     <div class="hero-decoration-1"></div>
-    <img src="https://www.pexels.com/photo/assorted-accessories-on-the-table-8396300/ alt="accessories" class="hero-image" />
     <div class="hero-decoration-2"></div>
   </div>
 `;
