@@ -15,8 +15,6 @@ export function renderHeader() {
           <button class="nav-link" onclick="handleCatClick('men')">Men</button>
           <button class="nav-link" onclick="handleCatClick('women')">Women</button>
           <button class="nav-link" onclick="handleCatClick('kids')">Kids</button>
-          <button class="nav-link" onclick="handleCatClick('footwear')">Footwear</button>
-          <button class="nav-link" onclick="handleCatClick('accessories')">Accessories</button>
         </nav>
       </div>
       <div class="header-right">
