@@ -109,7 +109,7 @@ def delete_all_products():
 @router.post("/bulk-generate-500")
 def bulk_generate_500():
     """
-    Generate 500 demo clothing products across 3 categories: men, women, kids.
+    Generate 500 demo clothing products across 5 categories: men, women, kids, footwear, accessories.
     Items are consistent and keyword-searchable (e.g. "Classic Blue Jeans").
     Each category gets ~166 products cycling through real clothing item types.
     Images come from loremflickr.com using category-specific fashion keywords.
@@ -140,6 +140,18 @@ def bulk_generate_500():
                       "Pajama", "Romper", "Hoodie", "Sweater", "Shirt"],
             "keywords": ["kids+fashion", "children+clothing", "kids+wear"],
         },
+        {
+            "name": "footwear",
+            "items": ["Shoes", "Boots", "Sandals", "Slippers", "Sneakers",
+                      "Heels", "Flats", "Wedges", "Flip Flops", "Loafers"],
+            "keywords": ["footwear", "shoes", "boots", "sandals"],
+        },
+        {
+            "name": "accessories",
+            "items": ["Bag", "Watch", "Scarf", "Hat", "Sunglasses",
+                      "Belt", "Jewelry", "Wallet", "Gloves", "Phone Case"],
+            "keywords": ["accessories", "bag", "watch", "jewelry"],
+        },
     ]
 
     descriptions = [
@@ -159,7 +171,7 @@ def bulk_generate_500():
     products = []
 
     for i in range(500):
-        cat = categories[i % 3]          # cycle evenly: men, women, kids
+        cat = categories[i % 3]          # cycle evenly: men, women, kids, footwear, accessories
         item = cat["items"][i % len(cat["items"])]   # cycle through item types
         adj  = adjectives[i % len(adjectives)]
         color = colors[i % len(colors)]
