@@ -75,7 +75,7 @@ def get_products(category: str = "", min_price: int = None, max_price: int = Non
             product["reviews"] = 0
 
         # If the product already has a plain image URL, use it directly
-        if "image" in product and product["image"] and not isinstance(product["image"], str) is False:
+        if "image" in product and isinstance(product["image"], str) and product["image"]:
             if product["image"].startswith("http"):
                 pass  # Already a valid URL, keep it as-is
             elif "image_data" in product and "image_content_type" in product:
@@ -171,7 +171,7 @@ def bulk_generate_500():
     products = []
 
     for i in range(500):
-        cat = categories[i % 3]          # cycle evenly: men, women, kids, footwear, accessories
+        cat = categories[i % 5]          # cycle evenly: men, women, kids, footwear, accessories
         item = cat["items"][i % len(cat["items"])]   # cycle through item types
         adj  = adjectives[i % len(adjectives)]
         color = colors[i % len(colors)]

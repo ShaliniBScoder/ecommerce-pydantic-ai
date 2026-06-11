@@ -117,7 +117,7 @@ function setupHomeEvents() {
           e.target.textContent = 'Add to Cart';
         }
       } else {
-        navigate(`#/product/${card.dataset.id}`);
+        navigate(`/product/${card.dataset.id}`);
       }
     });
   });

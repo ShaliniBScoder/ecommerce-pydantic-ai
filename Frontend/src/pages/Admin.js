@@ -8,7 +8,7 @@ import { renderHeader } from '../components/Header.js';
 export async function renderAdmin() {
   const data = await fetchProducts();
   state.productList = data;
-  
+
   document.getElementById('app').innerHTML = `
     ${renderHeader()}
     <div class="admin-page">
@@ -88,7 +88,7 @@ export async function renderAdmin() {
       </div>
     </div>
   `;
-  
+
   setupAdminEvents();
 }
 
@@ -99,7 +99,7 @@ function setupAdminEvents() {
       renderAdmin();
     });
   });
-  
+
   document.querySelectorAll('[data-size]').forEach(cb => {
     cb.addEventListener('change', () => {
       const size = cb.dataset.size;
@@ -111,14 +111,14 @@ function setupAdminEvents() {
       }
     });
   });
-  
+
   document.getElementById('addProductBtn')?.addEventListener('click', handleAddProduct);
   document.getElementById('updateProductBtn')?.addEventListener('click', handleUpdateProduct);
   document.getElementById('cancelEditBtn')?.addEventListener('click', () => {
     resetAdminForm();
     renderAdmin();
   });
-  
+
   document.getElementById('bulkGenBtn')?.addEventListener('click', async () => {
     const btn = document.getElementById('bulkGenBtn');
     btn.textContent = "⏳ Generating...";
@@ -127,7 +127,7 @@ function setupAdminEvents() {
       await bulkGenerateProducts();
       alert('500 Products Generated Successfully! Images may take a moment to load from LoremFlickr.');
       renderAdmin();
-    } catch(e) {
+    } catch (e) {
       alert('Failed to generate products.');
       btn.textContent = "⚡ Generate 500 Demo Products";
       btn.disabled = false;
@@ -150,18 +150,18 @@ function setupAdminEvents() {
       }
     }
   });
-  
+
   document.querySelectorAll('.edit-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const product = state.productList.find(p => String(p.id) === String(btn.dataset.id));
       if (product) editProduct(product);
     });
   });
-  
+
   document.querySelectorAll('.delete-btn').forEach(btn => {
     btn.addEventListener('click', () => handleDeleteProduct(btn.dataset.id));
   });
-  
+
   document.getElementById('adminImage')?.addEventListener('change', (e) => {
     state.imageFile = e.target.files?.[0] || null;
   });
@@ -193,12 +193,17 @@ async function handleAddProduct() {
   adminForm.description = document.getElementById('adminDesc').value;
   adminForm.price = Number(document.getElementById('adminPrice').value);
   adminForm.color = document.getElementById('adminColor').value.split(',').map(c => c.trim()).filter(c => c);
-  
+
   if (!adminForm.name || !adminForm.description || !adminForm.price || !adminForm.category) {
     alert('Please fill in all fields');
     return;
   }
-  
+
+  if (!state.imageFile) {
+    alert('Please select a product image');
+    return;
+  }
+
   const formData = new FormData();
   formData.append('name', adminForm.name);
   formData.append('description', adminForm.description);
@@ -206,8 +211,8 @@ async function handleAddProduct() {
   formData.append('category', adminForm.category);
   formData.append('size', adminForm.size?.join(',') || 'M,L');
   formData.append('color', adminForm.color?.join(', ') || 'Black');
-  if (state.imageFile) formData.append('image', state.imageFile);
-  
+  formData.append('image', state.imageFile);
+
   await addProduct(formData);
   alert('Product Added ✅');
   resetAdminForm();
@@ -220,12 +225,12 @@ async function handleUpdateProduct() {
   adminForm.description = document.getElementById('adminDesc').value;
   adminForm.price = Number(document.getElementById('adminPrice').value);
   adminForm.color = document.getElementById('adminColor').value.split(',').map(c => c.trim()).filter(c => c);
-  
+
   if (!adminForm.name || !adminForm.description || !adminForm.price || !adminForm.category) {
     alert('Please fill in all fields');
     return;
   }
-  
+
   if (state.imageFile) {
     const formData = new FormData();
     formData.append('name', adminForm.name);
@@ -239,7 +244,7 @@ async function handleUpdateProduct() {
   } else {
     await updateProduct(state.editId, { ...adminForm, size: adminForm.size || ['M', 'L'], color: adminForm.color || ['Black'] });
   }
-  
+
   alert('Product Updated ✅');
   resetAdminForm();
   renderAdmin();
