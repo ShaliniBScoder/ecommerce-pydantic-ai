@@ -107,21 +107,16 @@ def delete_all_products():
 
 
 @router.post("/bulk-generate-500")
-def bulk_generate_500():
+def bulk_generate_500(categories: str = ""):
     """
-    Generate 500 demo clothing products across 5 categories: men, women, kids, footwear, accessories.
-    Items are consistent and keyword-searchable (e.g. "Classic Blue Jeans").
-    Each category gets ~166 products cycling through real clothing item types.
-    Images come from loremflickr.com using category-specific fashion keywords.
+    Generate demo clothing products. Optionally pass a comma-separated list of
+    categories (e.g. 'footwear,accessories') via the `categories` query param.
+    When specified, 100 products per selected category are generated.
+    When omitted, all 5 categories are used (500 products total).
     """
     import random
 
-    adjectives = ["Classic", "Modern", "Premium", "Casual", "Elegant", "Trendy",
-                  "Vintage", "Sporty", "Bold", "Slim", "Relaxed", "Formal"]
-    colors = ["Black", "White", "Navy Blue", "Red", "Olive", "Beige",
-              "Burgundy", "Mustard", "Grey", "Pink", "Teal", "Brown"]
-
-    categories = [
+    ALL_CATEGORIES = [
         {
             "name": "men",
             "items": ["Shirt", "T-Shirt", "Jeans", "Chinos", "Blazer",
@@ -154,6 +149,10 @@ def bulk_generate_500():
         },
     ]
 
+    adjectives = ["Classic", "Modern", "Premium", "Casual", "Elegant", "Trendy",
+                  "Vintage", "Sporty", "Bold", "Slim", "Relaxed", "Formal"]
+    colors = ["Black", "White", "Navy Blue", "Red", "Olive", "Beige",
+              "Burgundy", "Mustard", "Grey", "Pink", "Teal", "Brown"]
     descriptions = [
         "A comfortable fit for everyday wear.",
         "Premium quality fabric, perfect for all occasions.",
@@ -166,33 +165,46 @@ def bulk_generate_500():
         "A bold look that makes a statement.",
         "Expertly tailored for a modern silhouette.",
     ]
-
     sizes_pool = ["S", "M", "L", "XL", "XXL"]
+
+    # Filter to requested categories (or use all 5)
+    requested = [c.strip().lower() for c in categories.split(",") if c.strip()] if categories else []
+    selected_cats = [c for c in ALL_CATEGORIES if not requested or c["name"] in requested]
+
+    if not selected_cats:
+        raise HTTPException(status_code=400, detail="No valid categories specified.")
+
+    # 100 products per selected category
+    products_per_cat = 100
     products = []
+    global_idx = 0
 
-    for i in range(500):
-        cat = categories[i % 5]          # cycle evenly: men, women, kids, footwear, accessories
-        item = cat["items"][i % len(cat["items"])]   # cycle through item types
-        adj  = adjectives[i % len(adjectives)]
-        color = colors[i % len(colors)]
-        keyword = cat["keywords"][i % len(cat["keywords"])]
-        seed = 1000 + i
+    for cat in selected_cats:
+        for j in range(products_per_cat):
+            adj   = adjectives[global_idx % len(adjectives)]
+            color = colors[global_idx % len(colors)]
+            item  = cat["items"][j % len(cat["items"])]
+            keyword = cat["keywords"][j % len(cat["keywords"])]
+            seed  = 2000 + global_idx
 
-        products.append({
-            "name": f"{adj} {color} {item}",
-            "description": descriptions[i % len(descriptions)],
-            "price": random.randint(299, 7999),
-            "category": cat["name"],
-            "size": random.sample(sizes_pool, k=random.randint(2, 4)),
-            "color": [color],
-            "image": f"https://loremflickr.com/400/500/{keyword}?lock={seed}",
-            "inStock": True,
-            "rating": round(random.uniform(3.5, 5.0), 1),
-            "reviews": random.randint(5, 300),
-        })
+            products.append({
+                "name": f"{adj} {color} {item}",
+                "description": descriptions[global_idx % len(descriptions)],
+                "price": random.randint(299, 7999),
+                "category": cat["name"],
+                "size": random.sample(sizes_pool, k=random.randint(2, 4)),
+                "color": [color],
+                "image": f"https://loremflickr.com/400/500/{keyword}?lock={seed}",
+                "inStock": True,
+                "rating": round(random.uniform(3.5, 5.0), 1),
+                "reviews": random.randint(5, 300),
+            })
+            global_idx += 1
 
     products_collection.insert_many(products)
-    return {"message": "500 demo products generated successfully!"}
+    cat_names = ", ".join(c["name"] for c in selected_cats)
+    total = len(products)
+    return {"message": f"{total} demo products generated for: {cat_names}."}
 
 
 @router.post("/bulk")

@@ -15,10 +15,18 @@ export async function fetchProducts(category = '', minPrice = null, maxPrice = n
 }
 
 /**
- * Generate 500 demo products instantaneously via the backend Python script.
+ * Generate demo products via the backend Python script.
+ * @param {string[]} categories - Optional list of categories to generate for.
+ *   When empty/omitted, all 5 categories are generated (500 products total).
+ *   When specified, 100 products per selected category are created.
  */
-export async function bulkGenerateProducts() {
-  const res = await fetch(`${API_BASE}/products/bulk-generate-500`, {
+export async function bulkGenerateProducts(categories = []) {
+  const params = new URLSearchParams();
+  if (categories.length > 0) {
+    params.set('categories', categories.join(','));
+  }
+  const query = params.toString() ? `?${params.toString()}` : '';
+  const res = await fetch(`${API_BASE}/products/bulk-generate-500${query}`, {
     method: 'POST'
   });
   return await res.json();
